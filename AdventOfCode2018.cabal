@@ -1,0 +1,65 @@
+name:                AdventOfCode2018
+version:             0.1.0.0
+synopsis:            Advent of code - Season 2018
+description:         Please see README.md
+homepage:            https://github.com/guibou/AdventOfCode2018#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Guillaume Bouchard
+maintainer:          guillaum.bouchard@gmail.com
+copyright:           2018 Guillaume Bouchard
+category:            Web
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:       Utils
+  build-depends:       base >= 4.7 && < 5,
+                       hspec,
+                       megaparsec,
+                       cryptohash,
+                       base16-bytestring,
+                       bytestring,
+                       containers,
+                       parallel,
+                       vector,
+                       file-embed,
+                       unordered-containers,
+                       template-haskell,
+                       memoize,
+                       split,
+                       here,
+                       protolude,
+                       text,
+                       union-find,
+                       hex,
+                       matrix,
+                       hashable
+  default-extensions: TupleSections
+                    , DeriveAnyClass
+                    , StandaloneDeriving
+                    , DeriveGeneric
+                    , OverloadedStrings
+                    , BangPatterns
+                    , ViewPatterns
+                    , PatternSynonyms
+                    , ScopedTypeVariables
+                    , BinaryLiterals
+                    , TemplateHaskell
+                    , PartialTypeSignatures
+                    , QuasiQuotes
+                    , GeneralizedNewtypeDeriving
+                    , DerivingStrategies
+                    , NoImplicitPrelude
+                    , FlexibleContexts
+                    , LambdaCase
+                    , TypeApplications
+  ghc-options: -Wall -Wno-missing-signatures -fwarn-incomplete-uni-patterns -Wno-missing-home-modules
+
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/guibou/AdventOfCode2017
