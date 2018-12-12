@@ -23,7 +23,7 @@ import Text.Megaparsec
 import qualified Text.Megaparsec.Char.Lexer as L
 import Text.Megaparsec.Char
 
-import Crypto.Hash.MD5 (hash)
+import qualified Crypto.Hash.MD5
 import Data.ByteString.Base16 (encode)
 
 import Control.Parallel.Strategies (parBuffer, using, rdeepseq)
@@ -101,7 +101,7 @@ bfs stopCriterion start stepFunction = go (Set.singleton start) (Set.empty) 0
                         in go okSteps (Set.union todos visited) (depth + 1)
 
 md5 :: ByteString -> ByteString
-md5 = encode . hash
+md5 = encode . Crypto.Hash.MD5.hash
 
 parBufferChunks :: NFData t => [t] -> [t]
 parBufferChunks l = let chunks = (chunksOf 4096 l)

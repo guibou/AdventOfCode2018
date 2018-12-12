@@ -24,6 +24,7 @@ library
                        bytestring,
                        containers,
                        parallel,
+                       time,
                        vector,
                        file-embed,
                        unordered-containers,
@@ -56,7 +57,7 @@ library
                     , FlexibleContexts
                     , LambdaCase
                     , TypeApplications
-  ghc-options: -Wall -Wno-missing-signatures -fwarn-incomplete-uni-patterns -Wno-missing-home-modules
+  ghc-options: -Wall -Wno-missing-signatures -fwarn-incomplete-uni-patterns -Wno-missing-home-modules -Wno-deprecations -Wno-partial-type-signatures
 
   default-language:    Haskell2010
 
