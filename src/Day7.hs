@@ -9,7 +9,7 @@ import Text.Megaparsec.Char.Lexer
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 
---start 23h42 -> 23h58
+--start 23h42 -> 23h58 -> 1h07
 
 fileContent :: Text
 fileContent = $(getFile)

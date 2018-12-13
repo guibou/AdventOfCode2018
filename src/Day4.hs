@@ -81,14 +81,46 @@ guardSleep tr = sum (map trTime tr)
   where
     trTime (TimeRange a b) = diffUTCTime b a
 
+pickBestGuard :: Map Int [TimeRange] -> (Int, [TimeRange])
+pickBestGuard m = maximumBy (comparing (guardSleep . snd)) (Map.toList m)
+
+pickBestSecond :: [TimeRange] -> Integer
+pickBestSecond tr = let
+  ranges = concatMap timeRangeToRange tr
+  m = Map.fromListWith (+) (map (,1) ranges)
+  in fst (maximumBy (comparing snd) (Map.toList m))
+
+pickBestSecond' :: [TimeRange] -> (Integer, Integer)
+pickBestSecond' tr = let
+  ranges = concatMap timeRangeToRange tr
+  m = Map.fromListWith (+) (map (,1) ranges)
+  in maximumBy (comparing snd) (Map.toList m)
+
+timeRangeToRange :: TimeRange -> [Integer]
+timeRangeToRange (TimeRange start end) =
+  let tStart = (diffTimeToPicoseconds $ utctDayTime start) `div` (10 ^ 12) `div` 60
+      tEnd = (diffTimeToPicoseconds $ utctDayTime end) `div` (10 ^ 12) `div` 60
+
+    in [tStart .. (tEnd -1)]
 
 -- * FIRST problem
 day :: _ -> Int
-day = undefined
+day e = let
+  (guard, tr) = pickBestGuard $ eventToGuardMap e
+  sec = pickBestSecond tr
+  in (guard * fromIntegral sec)
+
+-- first start: 20h39
+-- second start: 20h47
 
 -- * SECOND problem
-day' :: _ -> Int
-day' = undefined
+day' :: [Event] -> _
+day' e = let
+  guardMap = eventToGuardMap e
+  guardBestSecond = Map.toList $ map pickBestSecond' guardMap
+  (guard, (bestSec, count)) = maximumBy (comparing (snd . snd)) guardBestSecond
+  in guard * fromIntegral bestSec
+  
 
 -- * Tests
 
