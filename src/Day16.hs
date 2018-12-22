@@ -1,9 +1,10 @@
+{-# LANGUAGE DataKinds, KindSignatures, GADTs #-}
+{-# OPTIONS -Wno-name-shadowing #-}
 module Day16 where
 
 -- start : 21h38 -> 22h41 -> 23h17
 
 import Text.Megaparsec
-import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer
 
 import qualified Control.Monad.State as S
@@ -12,22 +13,18 @@ import Utils hiding (R1)
 import Data.List (delete)
 
 parseList :: Parser [Int]
-parseList = do
-  "["
-  l <- decimal `sepBy` ", "
-  "]"
-  pure l
+parseList = "[" *> (decimal `sepBy` ", ") <* "]"
 
 parseExample :: Parser ([Int], [Int], [Int])
 parseExample = do
-  "Before: "
+  _ <- "Before: "
   l0 <- parseList
-  "\n"
+  _ <- "\n"
   op <- decimal `sepBy` " "
-  "\n"
-  "After:  "
+  _ <- "\n"
+  _ <- "After:  "
   l1 <- parseList
-  "\n"
+  _ <- "\n"
 
   pure (l0, op, l1)
 
@@ -35,7 +32,7 @@ parseExamples = Text.Megaparsec.some (parseExample <* "\n")
 
 parseFile = do
   exs <- parseExamples
-  "\n\n"
+  _ <- "\n\n"
   instr <- ((decimal :: Parser Int) `sepBy` " ") `sepBy` "\n"
 
   pure (exs, instr)
@@ -115,57 +112,39 @@ eqir = cmp @Int @Register (==)
 eqri = cmp @Register @Int (==)
 eqrr = cmp @Register @Register (==)
 
+-- OPCodes
+data OpCodeType = RR | RI | IR
+  deriving (Show)
 
-data OpCodes =
-  GTir | EQir | SETi |
-  GTrr | EQrr | ADDr | MULr | BANr | BORr | SETr |
-  GTri | EQri | ADDi | MULi | BANi | BORi
+data OpCode
+  = OpCodeIR OpCodeIR
+  | OpCodeRR OpCodeRR
+  | OpCodeRI OpCodeRI
   deriving (Show, Eq, Ord)
 
-irs = [GTir, EQir, SETi]
-rrs = [GTrr, EQrr, ADDr, MULr, BANr, BORr, SETr]
-ris = [GTri, EQri, ADDi, MULi, BANi, BORi]
+data OpCodeIR = GTir | EQir | SETi
+  deriving (Show, Eq, Ord, Enum, Bounded)
 
-matchingOpCode :: (_, _, _) -> ([Int], [Int], [Int]) -> _
-matchingOpCode (irs, rrs, ris) (before, [_opCode, a, b, c], after) =
+data OpCodeRR = GTrr | EQrr | ADDr | MULr | BANr | BORr | SETr
+  deriving (Show, Eq, Ord, Enum, Bounded)
+
+data OpCodeRI = GTri | EQri | ADDi | MULi | BANi | BORi
+  deriving (Show, Eq, Ord, Enum, Bounded)
+
+matchingOpCode :: _ -> ([Int], [Int], [Int]) -> _
+matchingOpCode ops (before, [_opCode, a, b, c], after) =
   let
     beforeS = mFromList before
     afterS = mFromList after
-  in ( filter (\op -> testOp (toOpIR op a (reg b) (reg c)) beforeS afterS) irs
-     , filter (\op -> testOp (toOpRR op (reg a) (reg b) (reg c)) beforeS afterS) rrs
-     , filter (\op -> testOp (toOpRI op (reg a) b (reg c)) beforeS afterS) ris
-     )
+  in filter (\op -> testOp (eval op a b (reg c)) beforeS afterS) ops
 
-isIR = \case
-  GTir -> True
-  EQir -> True
-  SETi -> True
-  _ -> False
-
-isRR = \case
-  GTrr -> True
-  EQrr -> True
-  ADDr -> True
-  MULr -> True
-  BANr -> True
-  BORr -> True
-  SETr -> True
-  _ -> False
-
-isRI = \case
-  GTri -> True
-  EQri -> True
-  ADDi -> True
-  MULi -> True
-  BANi -> True
-  BORi -> True
-  _ -> False
-
+toOpIR :: OpCodeIR -> _
 toOpIR = \case
   GTir -> gtir
   EQir -> eqir
   SETi -> seti
 
+toOpRR :: OpCodeRR -> _
 toOpRR = \case
   GTrr -> gtrr
   EQrr -> eqrr
@@ -175,6 +154,7 @@ toOpRR = \case
   BORr -> borr
   SETr -> setr
 
+toOpRI :: OpCodeRI -> _
 toOpRI = \case
   GTri -> gtri
   EQri -> eqri
@@ -182,12 +162,13 @@ toOpRI = \case
   MULi -> muli
   BANi -> bani
   BORi -> bori
+
+allOps = (OpCodeRR <$> [minBound .. maxBound])
+         ++ (OpCodeRI <$> [minBound .. maxBound])
+         ++ (OpCodeIR <$> [minBound .. maxBound])
   
-test :: ([Int], [Int], [Int]) -> _
-test sample = 
-  let
-    (mIR, mRR, mRI) = matchingOpCode (irs, rrs, ris) sample
-  in length mIR + length mRR + length mRI
+testSample :: ([Int], [Int], [Int]) -> _
+testSample sample = length $ matchingOpCode allOps sample
 
 testOp :: Machine () -> Map Register Int -> Map Register Int -> Bool
 testOp op before after =
@@ -198,24 +179,24 @@ reg 0 = R0
 reg 1 = R1
 reg 2 = R2
 reg 3 = R3
+reg _ = panic "Wrong register number"
 
-countSamples samples = length (filter (\s -> test s >= 3) samples)
+countSamples samples = length (filter (\s -> testSample s >= 3) samples)
 
 
 -- part2
 
 getSampleOpCode (_, opCode:_, _) = opCode
 
-associateOpcodes :: [_] -> Map Int OpCodes
-associateOpcodes samples = go Map.empty samples (irs, rrs, ris)
+associateOpcodes :: [_] -> Map Int OpCode
+associateOpcodes samples = go Map.empty samples allOps
   where
-    go m _ ([], [], []) = m
+    go m _ [] = m
     go m [] tests = go m samples tests
-    go m (sample:xs) tests@(irs, rrs, ris) = let
-      (mIR, mRR, mRI) = matchingOpCode tests sample
-      matchings = mIR ++ mRR ++ mRI
+    go m (sample:xs) tests = let
+      matchings = matchingOpCode tests sample
       in case matchings of
-           [x] -> go (Map.insert (getSampleOpCode sample) x m) xs (x `delete` irs, x `delete` rrs, x `delete` ris)
+           [x] -> go (Map.insert (getSampleOpCode sample) x m) xs (x `delete` tests)
            _ -> go m xs tests
 
 -- * Generics
@@ -223,42 +204,37 @@ applyProgram :: (_, _) -> _
 applyProgram (samples, program) = let
   opcodes = associateOpcodes samples
   res = runMachine (makeProgram opcodes program) defaultMachine
-  in Map.lookup R0 res
+  in fromMaybe (panic "I know there is a register 0") $ Map.lookup R0 res
 
-makeProgram :: Map Int OpCodes -> [[Int]] -> Machine ()
+makeProgram :: Map Int OpCode -> [[Int]] -> Machine ()
 makeProgram assoc l = go l
   where
     go [] = pure ()
     go (x:xs) = opCodeToInstr assoc x >> go xs
 
 opCodeToInstr assoc [opCode, a, b, c] = let
-  fn = fromMaybe undefined (Map.lookup opCode assoc)
+  fn = fromMaybe (panic "...") (Map.lookup opCode assoc)
   in eval fn a b (reg c)
 
-eval opcode a b
-  | isRR opcode = toOpRR opcode (reg a) (reg b) 
-  | isRI opcode = toOpRI opcode (reg a) b
-  | isIR opcode = toOpIR opcode a (reg b) 
+eval opcode a b = case opcode of
+  OpCodeRR rr -> toOpRR rr (reg a) (reg b) 
+  OpCodeRI ri -> toOpRI ri (reg a) b
+  OpCodeIR ir -> toOpIR ir a (reg b) 
 
 -- * FIRST problem
 day :: _ -> Int
 day = countSamples
 
 -- * SECOND problem
-day' :: _ -> Int
-day' = undefined
+day' :: _ -> _
+day' = applyProgram
 
 -- * Tests
 
--- test :: Spec
--- test = do
---   describe "simple examples" $ do
---     it "of first star" $ do
---       day "" `shouldBe` 0
---     it "of second star" $ do
---       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
+test :: Spec
+test = do
+ describe "works" $ do
+   it "on first star" $ do
+     day (fst fileContent) `shouldBe` 531
+   it "on second star" $ do
+     day' fileContent `shouldBe` 649
