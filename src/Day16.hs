@@ -40,7 +40,7 @@ parseFile = do
 
 fileContent = unsafeParse parseFile $(getFile)
 
-data Register = R0 | R1 | R2 | R3
+data Register = R0 | R1 | R2 | R3 | R4 | R5 -- TODO: generic between day 19 and day 16
   deriving (Show, Ord, Eq, Generic, Enumerable)
 
 newtype Machine t = Machine (S.State (Map Register Int) t)
@@ -56,7 +56,7 @@ runMachine :: Machine () -> Map Register Int -> Map Register Int
 runMachine (Machine s) m = let ((), res) = runState s m in res
 
 defaultMachine :: Map Register Int
-defaultMachine = mFromList [0, 0, 0, 0]
+defaultMachine = mFromList (repeat 0)
 
 mFromList :: [Int] -> Map Register Int
 mFromList l = Map.fromList (zip enumerated l)
@@ -171,6 +171,8 @@ reg 0 = R0
 reg 1 = R1
 reg 2 = R2
 reg 3 = R3
+reg 4 = R4
+reg 5 = R5
 reg _ = panic "Wrong register number"
 
 countSamples samples = length (filter (\s -> testSample s >= 3) samples)
