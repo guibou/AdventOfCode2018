@@ -41,13 +41,13 @@ parseFile = do
 fileContent = unsafeParse parseFile $(getFile)
 
 data Register = R0 | R1 | R2 | R3
-  deriving (Show, Ord, Eq, Enum, Bounded)
+  deriving (Show, Ord, Eq, Generic, Enumerable)
 
 newtype Machine t = Machine (S.State (Map Register Int) t)
   deriving newtype (Functor, Applicative, Monad)
 
 read :: Register -> Machine Int
-read reg = Machine (gets (fromMaybe undefined . Map.lookup reg))
+read reg = Machine (gets (fromMaybe (panic "I Know my machine has this register") . Map.lookup reg))
 
 write :: Register -> Int -> Machine ()
 write reg i = Machine (modify (Map.insert reg i))
@@ -59,7 +59,7 @@ defaultMachine :: Map Register Int
 defaultMachine = mFromList [0, 0, 0, 0]
 
 mFromList :: [Int] -> Map Register Int
-mFromList l = Map.fromList (zip [minBound .. maxBound] l)
+mFromList l = Map.fromList (zip enumerated l)
 
 class RegisterValue t where
   value :: t -> Machine Int
@@ -71,23 +71,23 @@ instance RegisterValue Int where
   value i = pure i
 
 -- * Opcodes
-op :: RegisterValue roi => (Int -> Int -> Int) -> Register -> roi -> Register -> Machine ()
+op :: (RegisterValue roiA, RegisterValue roiB) => (Int -> Int -> Int) -> roiA -> roiB -> Register -> Machine ()
 op op inA inB outC = do
-  a <- read inA
+  a <- value inA
   b <- value inB
   write outC (op a b)
 
-addr = op @Register (+)
-addi = op @Int (+)
+addr = op @Register @Register (+)
+addi = op @Register @Int (+)
 
-mulr = op @Register (*)
-muli = op @Int (*)
+mulr = op @Register @Register (*)
+muli = op @Register @Int (*)
 
-banr = op @Register (.&.)
-bani = op @Int (.&.)
+banr = op @Register @Register (.&.)
+bani = op @Register @Int (.&.)
   
-borr = op @Register (.|.)
-bori = op @Int (.|.)
+borr = op @Register @Register (.|.)
+bori = op @Register @Int (.|.)
 
 setr :: RegisterValue roi => Register -> roi -> Register -> Machine ()
 setr regA _regB regC = read regA >>= write regC
@@ -98,11 +98,7 @@ seti i _regB regC = write regC i
 --
 
 cmp :: (RegisterValue roi0, RegisterValue roi1) => (Int -> Int -> Bool) -> roi0 -> roi1 -> Register -> Machine ()
-cmp f inA inB outC = do
-  a <- value inA
-  b <- value inB
-
-  write outC $ if f a b then 1 else 0
+cmp f = op (\a b -> if f a b then 1 else 0)
 
 gtir = cmp @Int @Register (>)
 gtri = cmp @Register @Int (>)
@@ -120,16 +116,16 @@ data OpCode
   = OpCodeIR OpCodeIR
   | OpCodeRR OpCodeRR
   | OpCodeRI OpCodeRI
-  deriving (Show, Eq, Ord)
+  deriving (Show, Eq, Ord, Generic, Enumerable)
 
 data OpCodeIR = GTir | EQir | SETi
-  deriving (Show, Eq, Ord, Enum, Bounded)
+  deriving (Show, Eq, Ord, Generic, Enumerable)
 
 data OpCodeRR = GTrr | EQrr | ADDr | MULr | BANr | BORr | SETr
-  deriving (Show, Eq, Ord, Enum, Bounded)
+  deriving (Show, Eq, Ord, Generic, Enumerable)
 
 data OpCodeRI = GTri | EQri | ADDi | MULi | BANi | BORi
-  deriving (Show, Eq, Ord, Enum, Bounded)
+  deriving (Show, Eq, Ord, Generic, Enumerable)
 
 matchingOpCode :: _ -> ([Int], [Int], [Int]) -> _
 matchingOpCode ops (before, [_opCode, a, b, c], after) =
@@ -163,12 +159,8 @@ toOpRI = \case
   BANi -> bani
   BORi -> bori
 
-allOps = (OpCodeRR <$> [minBound .. maxBound])
-         ++ (OpCodeRI <$> [minBound .. maxBound])
-         ++ (OpCodeIR <$> [minBound .. maxBound])
-  
 testSample :: ([Int], [Int], [Int]) -> _
-testSample sample = length $ matchingOpCode allOps sample
+testSample sample = length $ matchingOpCode enumerated sample
 
 testOp :: Machine () -> Map Register Int -> Map Register Int -> Bool
 testOp op before after =
@@ -189,7 +181,7 @@ countSamples samples = length (filter (\s -> testSample s >= 3) samples)
 getSampleOpCode (_, opCode:_, _) = opCode
 
 associateOpcodes :: [_] -> Map Int OpCode
-associateOpcodes samples = go Map.empty samples allOps
+associateOpcodes samples = go Map.empty samples enumerated
   where
     go m _ [] = m
     go m [] tests = go m samples tests
