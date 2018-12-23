@@ -37,7 +37,10 @@ library
                        union-find,
                        hex,
                        matrix,
-                       hashable
+                       hashable,
+                       mtl,
+                       enumerate,
+                       JuicyPixels
   default-extensions: TupleSections
                     , DeriveAnyClass
                     , StandaloneDeriving
