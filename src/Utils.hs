@@ -2,6 +2,7 @@ module Utils (
     module Utils
   , module Protolude
   , module Unsafe
+  , module Enumerate
   , HashMap
   , Vector
   , module Data.Function.Memoize
@@ -18,6 +19,8 @@ module Utils (
 
 import Protolude
 import Unsafe
+
+import Enumerate
 
 import Text.Megaparsec
 import qualified Text.Megaparsec.Char.Lexer as L
