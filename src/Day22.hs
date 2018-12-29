@@ -73,8 +73,8 @@ day = riskLevel
 data RescueTool = Nop | Torch | ClimbingGear
   deriving (Show, Generic, Enumerable, Eq, Ord)
   
-day' :: _ -> Int
-day' = undefined
+day' cave = fst <$> shortestPath (transition cave) (+) ((0, 0), Torch) (toTarget (target cave))
+ 
 
 type Status = ((Int, Int), RescueTool)
 
@@ -110,19 +110,12 @@ transitionClose cave ((x, y), currentT) = do
 
   pure nextCoord
 
-doit cave = shortestPath (transition cave) (+) ((0, 0), Torch) (toTarget (target cave))
- 
 -- * Tests
 
--- test :: Spec
--- test = do
---   describe "simple examples" $ do
---     it "of first star" $ do
---       day "" `shouldBe` 0
---     it "of second star" $ do
---       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
+test :: Spec
+test = do
+ describe "woks" $ do
+   it "on first star" $ do
+     day fileContent `shouldBe` 10115
+   it "on second star" $ do
+     day' fileContent `shouldBe` Just 990
