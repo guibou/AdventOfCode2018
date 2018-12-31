@@ -180,3 +180,12 @@ cycleSucc o
 
 pow10 :: Int -> Int
 pow10 a = 10 ^ a
+
+parseNumber :: (Num t) => Parser t
+parseNumber = fromIntegral <$> L.signed sc (lexeme L.decimal)
+  {-
+  f <- Text.Megaparsec.option identity (char '-' $> negate)
+  d <- L.decimal
+
+  pure (fromIntegral $ f d)
+-}
