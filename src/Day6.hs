@@ -150,18 +150,18 @@ example = unsafeParse (parseTuple `sepBy` "\n") [here|1, 1
 8, 9|]
 
 
--- test :: Spec
--- test = do
+test :: Spec
+test = do
 --   describe "simple examples" $ do
 --     it "of first star" $ do
 --       day "" `shouldBe` 0
 --     it "of second star" $ do
 --       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
+  describe "woks" $ do
+    it "on first star" $ do
+      day content `shouldBe` 5975
+    it "on second star" $ do
+      day' content 10000 `shouldBe` 38670
 
 -- done at 23h25. Don't rememeber when restarted (something like 22h30)
 -- star 2 23h37

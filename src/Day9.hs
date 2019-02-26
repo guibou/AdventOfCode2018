@@ -58,15 +58,15 @@ day' = day . map (*100)
 
 -- * Tests
 
--- test :: Spec
--- test = do
+test :: Spec
+test = do
 --   describe "simple examples" $ do
 --     it "of first star" $ do
 --       day "" `shouldBe` 0
 --     it "of second star" $ do
 --       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
+ describe "woks" $ do
+   it "on first star" $ do
+     day fileContent `shouldBe` 396136
+   it "on second star" $ do
+     day' fileContent `shouldBe` 3183301184

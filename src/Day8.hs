@@ -41,22 +41,22 @@ rootNodeValue (Tree ts metadata) = sum (map getSub metadata)
                   else rootNodeValue (ts `unsafeIndex` n')
   
 day' :: _ -> Int
-day' = undefined
+day' = rootNodeValue . fst . toTree
 
 -- * Tests
 
 example :: [Int]
 example = unsafeRead1D "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"
 
--- test :: Spec
--- test = do
+test :: Spec
+test = do
 --   describe "simple examples" $ do
 --     it "of first star" $ do
 --       day "" `shouldBe` 0
 --     it "of second star" $ do
 --       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
+  describe "woks" $ do
+    it "on first star" $ do
+      day fileContent `shouldBe` 48260
+    it "on second star" $ do
+      day' fileContent `shouldBe` 25981

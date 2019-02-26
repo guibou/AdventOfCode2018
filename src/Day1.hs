@@ -1,6 +1,6 @@
 module Day1 where
 
-import Utils
+import Utils hiding (parseNumber)
 
 import Text.Megaparsec
 import Text.Megaparsec.Char.Lexer
@@ -37,7 +37,7 @@ day ints = sum ints
 day' :: [Int] -> Maybe Int
 day' ints = let
   go (x:xs) v seen
-    | (traceShowId v) `Set.member` seen = Just v
+    | v `Set.member` seen = Just v
     | otherwise = go xs (v + x) (Set.insert v seen)
   
   in go (cycle ints) 0 Set.empty
@@ -46,15 +46,15 @@ day' ints = let
 
 -- * Tests
 
--- test :: Spec
--- test = do
+test :: Spec
+test = do
 --   describe "simple examples" $ do
 --     it "of first star" $ do
 --       day "" `shouldBe` 0
 --     it "of second star" $ do
 --       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
+ describe "woks" $ do
+   it "on first star" $ do
+     day content `shouldBe` 569
+   it "on second star" $ do
+     day' content `shouldBe` Just 77666

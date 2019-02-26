@@ -87,8 +87,8 @@ go pts
 -- first star: 19h58. second star: 19h59
 
 -- * FIRST problem
-day :: [Point] -> IO ()
-day = putStrLn . drawPoints . fst . go
+day :: [Point] -> Text
+day = drawPoints . fst . go
 
 -- * SECOND problem
 day' :: _ -> Int
@@ -128,15 +128,26 @@ position=< 5,  9> velocity=< 1, -2>
 position=<14,  7> velocity=<-2,  0>
 position=<-3,  6> velocity=< 2, -1>|]
 
--- test :: Spec
--- test = do
+test :: Spec
+test = do
 --   describe "simple examples" $ do
 --     it "of first star" $ do
 --       day "" `shouldBe` 0
 --     it "of second star" $ do
 --       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
+  describe "woks" $ do
+    it "on first star" $ do
+      day content `shouldBe` (Text.drop 1 [hereLit|
+######..######...####...#####....####....####....####......###
+.....#.......#..#....#..#....#..#....#..#....#..#....#......#.
+.....#.......#..#.......#....#..#.......#.......#...........#.
+....#.......#...#.......#....#..#.......#.......#...........#.
+...#.......#....#.......#####...#.......#.......#...........#.
+..#.......#.....#.......#....#..#..###..#..###..#...........#.
+.#.......#......#.......#....#..#....#..#....#..#...........#.
+#.......#.......#.......#....#..#....#..#....#..#.......#...#.
+#.......#.......#....#..#....#..#...##..#...##..#....#..#...#.
+######..######...####...#####....###.#...###.#...####....###..
+|])
+    it "on second star" $ do
+      day' content `shouldBe` 10886

@@ -127,20 +127,20 @@ Step B must be finished before step E can begin.
 Step D must be finished before step E can begin.
 Step F must be finished before step E can begin.|]
 
--- test :: Spec
--- test = do
+steps wC deltaT input = case pickNext' wC deltaT input of
+  Nothing -> []
+  Just (res, next) -> do
+    res:steps wC deltaT next
+
+test :: Spec
+test = do
 --   describe "simple examples" $ do
 --     it "of first star" $ do
 --       day "" `shouldBe` 0
 --     it "of second star" $ do
 --       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
-
-steps wC deltaT input = case pickNext' wC deltaT input of
-  Nothing -> []
-  Just (res, next) -> do
-    res:steps wC deltaT next
+  describe "woks" $ do
+    it "on first star" $ do
+      day fileContent `shouldBe` 1228
+    it "on second star" $ do
+      day' content `shouldBe` 1099

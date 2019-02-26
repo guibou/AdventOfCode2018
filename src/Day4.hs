@@ -124,15 +124,15 @@ day' e = let
 
 -- * Tests
 
--- test :: Spec
--- test = do
+test :: Spec
+test = do
 --   describe "simple examples" $ do
 --     it "of first star" $ do
 --       day "" `shouldBe` 0
 --     it "of second star" $ do
 --       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
+  describe "woks" $ do
+    it "on first star" $ do
+      day content `shouldBe` 143415
+    it "on second star" $ do
+      day' content `shouldBe` 49944
