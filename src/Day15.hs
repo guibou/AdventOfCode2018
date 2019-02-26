@@ -255,7 +255,7 @@ fixpoint2 game = go 3 200 -- 200 attack power is enough to oneshot everything
       | (a + 1) == b = fixpoint b game
       | otherwise = let
           c = (a + b) `div` 2
-          (endgame, _) = traceShow (a, c, b) $ fixpoint c game
+          (endgame, _) = fixpoint c game
           in if countElf endgame == startElf
              then go a c
              else go c b

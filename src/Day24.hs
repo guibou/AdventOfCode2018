@@ -168,7 +168,7 @@ boost boostValue units = case kind units of
 boostAll unitss boostValue = map (boost boostValue) unitss
 
 chien :: _ -> Maybe (Int, _)
-chien toto = find (\(_, g) -> winner (traceShowId g) == Just Immune) $ (zip [0..] $ (map (game . (boostAll toto)) [0..]))
+chien toto = find (\(_, g) -> winner g == Just Immune) $ (zip [0..] $ (map (game . (boostAll toto)) [0..]))
 
 day' :: _ -> Int
 day' = sum . map nbUnits . snd . fromMaybe (panic "da") . chien
@@ -185,15 +185,15 @@ Infection:
 
 -- * Tests
 
--- test :: Spec
--- test = do
+test :: Spec
+test = do
 --   describe "simple examples" $ do
 --     it "of first star" $ do
 --       day "" `shouldBe` 0
 --     it "of second star" $ do
 --       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
+ describe "woks" $ do
+   it "on first star" $ do
+     day fileContent `shouldBe` 26277
+   it "on second star" $ do
+     day' fileContent `shouldBe` 8812

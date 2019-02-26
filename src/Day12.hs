@@ -109,15 +109,10 @@ example = startIt $ unsafeParse game [here|initial state: #..#.#..##......###...
 ###.# => #
 ####. => #|]
 
--- test :: Spec
--- test = do
---   describe "simple examples" $ do
---     it "of first star" $ do
---       day "" `shouldBe` 0
---     it "of second star" $ do
---       day' "" `shouldBe` 0
---  describe "woks" $ do
---    it "on first star" $ do
---      day fileContent `shouldBe` 1228
---    it "on second star" $ do
---      day' fileContent `shouldBe` 1238
+test :: Spec
+test = do
+ describe "woks" $ do
+   it "on first star" $ do
+     day fileContent `shouldBe` 3217
+   it "on second star" $ do
+     day' fileContent `shouldBe` 4000000000866
