@@ -26,7 +26,7 @@ parseStuff :: Num t => Parser (Bot t)
 parseStuff = Bot <$> ("pos=<" *> parseV3) <*> (">, r=" *> parseNumber)
 
 parseContent :: Num t => Parser [Bot t]
-parseContent = parseStuff `sepBy` "\n"
+parseContent = Text.Megaparsec.some parseStuff
 
 dist (V3 x y z) (V3 x' y' z') = abs (x - x') + abs (y - y') + abs (z - z')
 
