@@ -59,7 +59,7 @@ defaultMachine :: Map Register Int
 defaultMachine = mFromList (repeat 0)
 
 mFromList :: [Int] -> Map Register Int
-mFromList l = Map.fromList (zip enumerated l)
+mFromList l = Map.fromList (zip genum l)
 
 class RegisterValue t where
   value :: t -> Machine Int
@@ -160,7 +160,7 @@ toOpRI = \case
   BORi -> bori
 
 testSample :: ([Int], [Int], [Int]) -> _
-testSample sample = length $ matchingOpCode enumerated sample
+testSample sample = length $ matchingOpCode genum sample
 
 testOp :: Machine () -> Map Register Int -> Map Register Int -> Bool
 testOp op before after =
@@ -183,7 +183,7 @@ countSamples samples = length (filter (\s -> testSample s >= 3) samples)
 getSampleOpCode (_, opCode:_, _) = opCode
 
 associateOpcodes :: [_] -> Map Int OpCode
-associateOpcodes samples = go Map.empty samples enumerated
+associateOpcodes samples = go Map.empty samples genum
   where
     go m _ [] = m
     go m [] tests = go m samples tests

@@ -39,7 +39,7 @@ library
                        matrix,
                        hashable,
                        mtl,
-                       enumerate,
+                       generic-deriving,
                        JuicyPixels,
                        pqueue,
                        sbv

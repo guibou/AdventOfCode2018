@@ -2,7 +2,6 @@ module Utils (
     module Utils
   , module Protolude
   , module Unsafe
-  , module Enumerate
   , HashMap
   , Vector
   , module Data.Function.Memoize
@@ -15,12 +14,13 @@ module Utils (
   , here
   , hereLit
   , chunksOf
+  , genum, GEnum
   ) where
 
 import Protolude
 import Unsafe
 
-import Enumerate
+import Generics.Deriving.Enum (genum, GEnum)
 
 import Text.Megaparsec
 import qualified Text.Megaparsec.Char.Lexer as L

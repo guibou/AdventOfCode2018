@@ -71,7 +71,7 @@ day = riskLevel
 
 -- * SECOND problem
 data RescueTool = Nop | Torch | ClimbingGear
-  deriving (Show, Generic, Enumerable, Eq, Ord)
+  deriving (Show, Generic, GEnum, Eq, Ord)
   
 day' cave = fst <$> shortestPath (transition cave) (+) ((0, 0), Torch) (toTarget (target cave))
  
@@ -93,7 +93,7 @@ available Narrow ClimbingGear = False
 available _ _ = True
 
 transitionSelf :: Cave -> ((Int, Int), RescueTool) -> [RescueTool]
-transitionSelf cave (coord, currentT) = filter (\t -> available (regionType cave coord) t && t /= currentT) enumerated
+transitionSelf cave (coord, currentT) = filter (\t -> available (regionType cave coord) t && t /= currentT) genum
 
 transitionClose :: Cave -> ((Int, Int), RescueTool) -> [(Int, Int)]
 transitionClose cave ((x, y), currentT) = do
