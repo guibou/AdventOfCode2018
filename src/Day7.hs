@@ -108,8 +108,8 @@ remove deltaT c key (Deps s) = let ns = Set.delete c s in if null ns
 remove _ c k t = t
 
 -- * FIRST problem
-day :: _ -> Int
-day = undefined
+day :: _ -> [Char]
+day = unfoldr pickNext . depTree
 
 -- * SECOND problem
 day' e deltaT wC= length (steps wC deltaT (depTree' wC e))
@@ -134,13 +134,8 @@ steps wC deltaT input = case pickNext' wC deltaT input of
 
 test :: Spec
 test = do
---   describe "simple examples" $ do
---     it "of first star" $ do
---       day "" `shouldBe` 0
---     it "of second star" $ do
---       day' "" `shouldBe` 0
   describe "woks" $ do
     it "on first star" $ do
-      day fileContent `shouldBe` 1228
+      day content `shouldBe` "JNOIKSYABEQRUVWXGTZFDMHLPC"
     it "on second star" $ do
-      day' content `shouldBe` 1099
+      day' content 61 5 `shouldBe` 1099
